@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengembaraan Hutan Algebra - Matematik Tingkatan 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800&display=swap');
+
+        * {
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+        }
+
+        .font-game {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        /* Jungle background styling */
+        .jungle-bg {
+            background: linear-gradient(180deg, #1d4ed8 0%, #3b82f6 30%, #22c55e 70%, #15803d 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Parallax Jungle Layers using pure CSS shapes & gradients */
+        .jungle-trees {
+            background-image: 
+                radial-gradient(circle at 20% 100%, #166534 0%, transparent 60%),
+                radial-gradient(circle at 50% 100%, #14532d 0%, transparent 70%),
+                radial-gradient(circle at 80% 100%, #166534 0%, transparent 60%);
+        }
+
+        /* Custom Pixel/Vibrant Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border: 4px solid #facc15;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        .wood-panel {
+            background: #854d0e;
+            border: 4px solid #fef08a;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* Button Styling with 3D Pop Effect */
+        .btn-option {
+            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+            border-bottom: 5px solid #0369a1;
+            transition: all 0.1s ease;
+        }
+
+        .btn-option:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .btn-option:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes walk {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .animate-walk {
+            animation: walk 0.4s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Custom Pulse Green for Correct Answer */
+        .btn-correct {
+            background: linear-gradient(180deg, #4ade80 0%, #16a34a 100%) !important;
+            border-color: #15803d !important;
+        }
+
+        .btn-wrong {
+            background: linear-gradient(180deg, #f87171 0%, #dc2626 100%) !important;
+            border-color: #991b1b !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-800 min-h-screen flex items-center justify-center p-2 sm:p-4">
+
+    <div id="game-container" class="w-full max-w-4xl jungle-bg h-[650px] sm:h-[700px] rounded-3xl border-8 border-amber-800 relative flex flex-col justify-between shadow-2xl overflow-hidden">
+        
+        <!-- Background Elements (Trees & Vines) -->
+        <div class="absolute inset-0 jungle-trees pointer-events-none opacity-80"></div>
+        <div class="absolute top-0 left-0 right-0 flex justify-between px-8 text-emerald-800 opacity-60 text-4xl pointer-events-none">
+            <i class="fa-solid fa-leaf transform -rotate-45"></i>
+            <i class="fa-solid fa-seedling"></i>
+            <i class="fa-solid fa-leaf transform rotate-45"></i>
+        </div>
+
+        <!-- 1. SKRIN MULA (START SCREEN) -->
+        <div id="start-screen" class="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
+            <div class="bg-amber-900/80 p-6 rounded-2xl border-4 border-yellow-400 max-w-md w-full shadow-2xl backdrop-blur-sm">
+                <div class="text-yellow-300 text-5xl mb-3 animate-float">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-game text-yellow-400 mb-2 drop-shadow-md">
+                    PENGEMBARAAN HUTAN ALGEBRA
+                </h1>
+                <p class="text-amber-100 font-semibold mb-6 text-sm sm:text-base">
+                    Matematik Tingkatan 1: Bab Ungkapan Algebra.<br>Bantu pengembara merentas hutan dengan menjawab soalan algebra!
+                </p>
+                <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-amber-950 font-game text-2xl rounded-xl border-b-4 border-amber-700 shadow-lg transform active:scale-95 transition">
+                    <i class="fa-solid fa-play mr-2"></i> MULA MAIN
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. PAPARAN PERMAINAN (GAMEPLAY SCREEN) -->
+        <div id="game-screen" class="relative z-10 flex flex-col justify-between h-full p-4 sm:p-6 hidden">
+            
+            <!-- HUD Utama (Atas) -->
+            <div class="flex flex-wrap items-center justify-between gap-2 bg-amber-950/80 p-3 rounded-2xl border-2 border-yellow-500/50 backdrop-blur-md text-white">
+                <!-- Nyawa -->
+                <div class="flex items-center gap-1 bg-amber-900/60 px-3 py-1.5 rounded-xl border border-amber-700">
+                    <span class="text-xs sm:text-sm font-bold text-amber-200 mr-1">NYAWA:</span>
+                    <div id="lives-container" class="flex gap-1 text-red-500 text-lg sm:text-xl">
+                        <i class="fa-solid fa-heart"></i>
+                        <i class="fa-solid fa-heart"></i>
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                </div>
+
+                <!-- Tahap / Level -->
+                <div class="bg-amber-900/60 px-4 py-1.5 rounded-xl border border-amber-700 font-game text-yellow-400 text-sm sm:text-base">
+                    TAHAP <span id="level-display">1</span>/10
+                </div>
+
+                <!-- Skor -->
+                <div class="flex items-center gap-2 bg-amber-900/60 px-3 py-1.5 rounded-xl border border-amber-700">
+                    <i class="fa-solid fa-star text-yellow-400"></i>
+                    <span class="text-xs sm:text-sm font-bold text-amber-200">SKOR:</span>
+                    <span id="score-display" class="font-game text-yellow-300 text-lg">0</span>
+                </div>
+            </div>
+
+            <!-- Visual Pentas Hutan 2D & Karakter -->
+            <div class="relative flex-1 my-4 flex items-end justify-between px-6 sm:px-12 pb-4">
+                <!-- Karakter Pemain -->
+                <div id="player-character" class="flex flex-col items-center transition-all duration-500">
+                    <div class="bg-yellow-400 text-amber-950 px-2 py-0.5 rounded-full text-xs font-bold mb-1 shadow">
+                        Pengembara
+                    </div>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full border-4 border-amber-900 flex items-center justify-center text-3xl sm:text-4xl shadow-xl relative">
+                        <i class="fa-solid fa-user-ninja text-amber-950"></i>
+                    </div>
+                </div>
+
+                <!-- Laluan / Jambatan Kayu visual -->
+                <div class="absolute bottom-0 left-0 right-0 h-4 bg-amber-900 border-t-2 border-yellow-600/50 z-0"></div>
+
+                <!-- Peti Harta / Halangan (Sasaran) -->
+                <div id="target-object" class="flex flex-col items-center z-10">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-b from-yellow-500 to-amber-700 rounded-lg border-4 border-amber-900 flex items-center justify-center text-2xl sm:text-3xl text-yellow-200 shadow-xl animate-bounce">
+                        <i class="fa-solid fa-chest-tile" id="target-icon">📦</i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kad Soalan Algebra -->
+            <div class="glass-card rounded-2xl p-4 sm:p-6 mb-2 relative z-20">
+                <div class="text-center mb-4">
+                    <span id="topic-badge" class="bg-amber-200 text-amber-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                        Permudahan Ungkapan
+                    </span>
+                    <h2 id="question-text" class="text-xl sm:text-2xl md:text-3xl font-game text-slate-900 mt-2">
+                        Permudahkan: 3x + 5x
+                    </h2>
+                </div>
+
+                <!-- Pilihan Jawapan (4 Butang Grid) -->
+                <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button onclick="checkAnswer(0)" class="btn-option text-white font-game text-lg sm:text-xl py-3 px-4 rounded-xl text-center shadow-md flex items-center justify-center gap-2">
+                        <span class="bg-white/20 w-7 h-7 rounded-lg text-sm flex items-center justify-center">A</span>
+                        <span class="option-text">8x</span>
+                    </button>
+                    <button onclick="checkAnswer(1)" class="btn-option text-white font-game text-lg sm:text-xl py-3 px-4 rounded-xl text-center shadow-md flex items-center justify-center gap-2">
+                        <span class="bg-white/20 w-7 h-7 rounded-lg text-sm flex items-center justify-center">B</span>
+                        <span class="option-text">15x</span>
+                    </button>
+                    <button onclick="checkAnswer(2)" class="btn-option text-white font-game text-lg sm:text-xl py-3 px-4 rounded-xl text-center shadow-md flex items-center justify-center gap-2">
+                        <span class="bg-white/20 w-7 h-7 rounded-lg text-sm flex items-center justify-center">C</span>
+                        <span class="option-text">8x²</span>
+                    </button>
+                    <button onclick="checkAnswer(3)" class="btn-option text-white font-game text-lg sm:text-xl py-3 px-4 rounded-xl text-center shadow-md flex items-center justify-center gap-2">
+                        <span class="bg-white/20 w-7 h-7 rounded-lg text-sm flex items-center justify-center">D</span>
+                        <span class="option-text">2x</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Kotak Maklum Balas Pintas -->
+            <div id="feedback-banner" class="h-10 flex items-center justify-center font-bold text-sm sm:text-base rounded-xl opacity-0 transition-opacity duration-300">
+                <!-- Maklum balas akan muncul di sini -->
+            </div>
+        </div>
+
+        <!-- 3. PAPARAN KEPUTUSAN (GAME OVER / VICTORY SCREEN) -->
+        <div id="result-screen" class="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center hidden">
+            <div class="bg-amber-950/90 p-6 sm:p-8 rounded-2xl border-4 border-yellow-400 max-w-md w-full shadow-2xl backdrop-blur-md">
+                <div id="result-icon" class="text-6xl mb-3 text-yellow-400">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h2 id="result-title" class="text-3xl sm:text-4xl font-game text-yellow-400 mb-2">
+                    TAHNIAH! TAHAP SELESAI
+                </h2>
+                <p id="result-message" class="text-amber-200 mb-6 font-semibold">
+                    Anda telah berjaya menakluki Hutan Algebra!
+                </p>
+
+                <!-- Ringkasan Markah -->
+                <div class="bg-amber-900/80 p-4 rounded-xl mb-6 border border-amber-700">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-amber-300 font-bold">Jumlah Skor:</span>
+                        <span id="final-score" class="font-game text-2xl text-yellow-400">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-amber-300 font-bold">Pencapaian:</span>
+                        <span id="final-rating" class="font-bold text-emerald-400">Pakar Algebra</span>
+                    </div>
+                </div>
+
+                <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-amber-950 font-game text-xl rounded-xl border-b-4 border-amber-700 shadow-lg transform active:scale-95 transition">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> MAIN LAGI
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Bank Soalan Matematik Tingkatan 1 (Ungkapan Algebra)
+        const questionBank = [
+            {
+                topic: "Sebutan Serupa",
+                question: "Permudahkan: 4x + 5x",
+                options: ["9x", "20x", "9x²", "x"],
+                correct: 0,
+                explanation: "Sebutan serupa boleh ditambah terus: 4x + 5x = 9x."
+            },
+            {
+                topic: "Nilai Ungkapan",
+                question: "Jika a = 3, cari nilai bagi 2a + 4.",
+                options: ["10", "8", "12", "14"],
+                correct: 0,
+                explanation: "Gantikan a = 3: 2(3) + 4 = 6 + 4 = 10."
+            },
+            {
+                topic: "Permudahan Ungkapan",
+                question: "Permudahkan: 7y - 3y + 2y",
+                options: ["6y", "4y", "12y", "2y"],
+                correct: 0,
+                explanation: "(7 - 3 + 2)y = 6y."
+            },
+            {
+                topic: "Kembangan / Darab",
+                question: "Ringkaskan: 3(x + 4)",
+                options: ["3x + 12", "3x + 4", "x + 12", "7x"],
+                correct: 0,
+                explanation: "Darab masuk 3 ke dalam kurungan: 3(x) + 3(4) = 3x + 12."
+            },
+            {
+                topic: "Sebutan Serupa",
+                question: "Permudahkan: 5p + 3q - 2p + q",
+                options: ["3p + 4q", "7p + 4q", "3p + 2q", "8pq"],
+                correct: 0,
+                explanation: "Kumpulkan sebutan serupa: (5p - 2p) + (3q + q) = 3p + 4q."
+            },
+            {
+                topic: "Nilai Ungkapan",
+                question: "Jika x = 2 dan y = 5, cari nilai bagi 3x + y.",
+                options: ["11", "13", "10", "16"],
+                correct: 0,
+                explanation: "Gantikan nilai: 3(2) + 5 = 6 + 5 = 11."
+            },
+            {
+                topic: "Sebutan Algebra",
+                question: "Berapakah bilangan sebutan dalam ungkapan 4a - 3b + 7?",
+                options: ["3 sebutan", "2 sebutan", "4 sebutan", "1 sebutan"],
+                correct: 0,
+                explanation: "Sebutan dipisahkan oleh tanda + atau - : (4a), (-3b), dan (7)."
+            },
+            {
+                topic: "Pendaraban Sebutan",
+                question: "Ringkaskan: 2m × 4n",
+                options: ["8mn", "6mn", "8m²n", "6m+n"],
+                correct: 0,
+                explanation: "Darabkan nombor dan pemboleh ubah: (2 × 4) × (m × n) = 8mn."
+            },
+            {
+                topic: "Nilai Ungkapan",
+                question: "Jika k = -3, cari nilai bagi 5 - 2k.",
+                options: ["11", "-1", "1", "-11"],
+                correct: 0,
+                explanation: "5 - 2(-3) = 5 + 6 = 11."
+            },
+            {
+                topic: "Permudahan Ungkapan",
+                question: "Permudahkan: (8a + 5b) - (3a - 2b)",
+                options: ["5a + 7b", "5a + 3b", "11a + 7b", "5a - 3b"],
+                correct: 0,
+                explanation: "Buka kurungan: 8a + 5b - 3a + 2b = (8a - 3a) + (5b + 2b) = 5a + 7b."
+            }
+        ];
+
+        // Pembolehubah Keadaan Permainan (Game State Variables)
+        let currentLevel = 0;
+        let score = 0;
+        let lives = 3;
+        let isAnsweringBlocked = false;
+        let shuffledQuestions = [];
+
+        // Elemen Audio Ringkas (Menggunakan Web Audio API tanpa perlukan fail luaran)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.2); // A5
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+                osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.3); // A2
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            }
+        }
+
+        // Helper untuk rawak jawapan
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startGame() {
+            currentLevel = 0;
+            score = 0;
+            lives = 3;
+            isAnsweringBlocked = false;
+
+            // Rawakkan susunan soalan dari bank soalan
+            shuffledQuestions = shuffleArray(questionBank).map(q => {
+                // Rawakkan pilihan jawapan bagi setiap soalan
+                const optionsWithIndex = q.options.map((opt, idx) => ({ text: opt, isCorrect: idx === q.correct }));
+                const shuffledOpts = shuffleArray(optionsWithIndex);
+                const newCorrectIndex = shuffledOpts.findIndex(opt => opt.isCorrect);
+                
+                return {
+                    topic: q.topic,
+                    question: q.question,
+                    options: shuffledOpts.map(o => o.text),
+                    correct: newCorrectIndex,
+                    explanation: q.explanation
+                };
+            });
+
+            // Kemaskini Paparan UI
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            updateHUD();
+            loadQuestion();
+        }
+
+        // Update Paparan HUD (Skor & Hati)
+        function updateHUD() {
+            document.getElementById('score-display').textContent = score;
+            document.getElementById('level-display').textContent = currentLevel + 1;
+
+            // Update Hati
+            const container = document.getElementById('lives-container');
+            container.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                if (i < lives) {
+                    container.innerHTML += '<i class="fa-solid fa-heart"></i>';
+                } else {
+                    container.innerHTML += '<i class="fa-regular fa-heart opacity-40"></i>';
+                }
+            }
+        }
+
+        // Load Soalan Semasa
+        function loadQuestion() {
+            isAnsweringBlocked = false;
+            const q = shuffledQuestions[currentLevel];
+
+            // Reset UI Butang
+            const buttons = document.querySelectorAll('#options-container button');
+            buttons.forEach((btn, index) => {
+                btn.className = 'btn-option text-white font-game text-lg sm:text-xl py-3 px-4 rounded-xl text-center shadow-md flex items-center justify-center gap-2';
+                btn.disabled = false;
+                btn.querySelector('.option-text').textContent = q.options[index];
+            });
+
+            document.getElementById('topic-badge').textContent = q.topic;
+            document.getElementById('question-text').textContent = q.question;
+
+            // Reset Banner Maklum Balas
+            const feedback = document.getElementById('feedback-banner');
+            feedback.className = 'h-10 flex items-center justify-center font-bold text-sm sm:text-base rounded-xl opacity-0 transition-opacity duration-300';
+            feedback.textContent = '';
+
+            // Animasikan Karakter Berjalan Sikit
+            const player = document.getElementById('player-character');
+            player.classList.add('animate-walk');
+            setTimeout(() => {
+                player.classList.remove('animate-walk');
+            }, 600);
+        }
+
+        function checkAnswer(selectedIndex) {
+            if (isAnsweringBlocked) return;
+            isAnsweringBlocked = true;
+
+            const q = shuffledQuestions[currentLevel];
+            const buttons = document.querySelectorAll('#options-container button');
+            const feedback = document.getElementById('feedback-banner');
+
+            if (selectedIndex === q.correct) {
+                // Jawapan Betul
+                playSound('correct');
+                buttons[selectedIndex].classList.add('btn-correct');
+                score += 100;
+
+                feedback.textContent = `BETUL! 🎉 ${q.explanation}`;
+                feedback.className = 'h-10 flex items-center justify-center font-bold text-sm sm:text-base rounded-xl bg-emerald-500 text-white opacity-100 transition-opacity duration-300 px-3';
+
+                // Tambah animasi pergerakan karakter
+                document.getElementById('player-character').classList.add('animate-bounce');
+                setTimeout(() => {
+                    document.getElementById('player-character').classList.remove('animate-bounce');
+                }, 800);
+
+                setTimeout(() => {
+                    currentLevel++;
+                    if (currentLevel >= shuffledQuestions.length) {
+                        endGame(true); // Menang
+                    } else {
+                        updateHUD();
+                        loadQuestion();
+                    }
+                }, 2000);
+
+            } else {
+                // Jawapan Salah
+                playSound('wrong');
+                buttons[selectedIndex].classList.add('btn-wrong');
+                buttons[q.correct].classList.add('btn-correct'); // Tunjuk jawapan betul
+
+                lives--;
+                updateHUD();
+
+                feedback.textContent = `SALAH! ❌ ${q.explanation}`;
+                feedback.className = 'h-10 flex items-center justify-center font-bold text-sm sm:text-base rounded-xl bg-red-500 text-white opacity-100 transition-opacity duration-300 px-3';
+
+                // Kesan gegaran skrin/karakter
+                document.getElementById('game-container').classList.add('animate-shake');
+                setTimeout(() => {
+                    document.getElementById('game-container').classList.remove('animate-shake');
+                }, 400);
+
+                setTimeout(() => {
+                    if (lives <= 0) {
+                        endGame(false); // Kalah
+                    } else {
+                        currentLevel++;
+                        if (currentLevel >= shuffledQuestions.length) {
+                            endGame(true);
+                        } else {
+                            updateHUD();
+                            loadQuestion();
+                        }
+                    }
+                }, 2500);
+            }
+        }
+
+        function endGame(isWin) {
+            document.getElementById('game-screen').classList.add('hidden');
+            const resultScreen = document.getElementById('result-screen');
+            resultScreen.classList.remove('hidden');
+
+            const title = document.getElementById('result-title');
+            const message = document.getElementById('result-message');
+            const icon = document.getElementById('result-icon');
+            const finalScore = document.getElementById('final-score');
+            const finalRating = document.getElementById('final-rating');
+
+            finalScore.textContent = score;
+
+            if (isWin) {
+                playSound('win');
+                icon.innerHTML = '<i class="fa-solid fa-trophy text-yellow-400"></i>';
+                title.textContent = 'TAHNIAH! ANDA MENANG!';
+                title.className = 'text-3xl sm:text-4xl font-game text-yellow-400 mb-2';
+                message.textContent = 'Hebat! Anda telah berjaya menyelesaikan semua cabaran Hutan Algebra!';
+
+                if (score >= 900) {
+                    finalRating.textContent = '🏆 Pakar Algebra (Cemerlang)';
+                    finalRating.className = 'font-bold text-emerald-400';
+                } else if (score >= 600) {
+                    finalRating.textContent = '⭐ Pengembara Bijak (Baik)';
+                    finalRating.className = 'font-bold text-yellow-400';
+                } else {
+                    finalRating.textContent = '👍 Lulus (Teruskan Usaha)';
+                    finalRating.className = 'font-bold text-blue-400';
+                }
+            } else {
+                icon.innerHTML = '<i class="fa-solid fa-heart-crack text-red-500"></i>';
+                title.textContent = 'PERMAINAN TAMAT!';
+                title.className = 'text-3xl sm:text-4xl font-game text-red-400 mb-2';
+                message.textContent = 'Kehabisan nyawa di tengah hutan! Jangan putus asa, cuba lagi untuk menguasai algebra.';
+                finalRating.textContent = '💪 Perlu Lebih Latihan';
+                finalRating.className = 'font-bold text-orange-400';
+            }
+        }
+    </script>
+</body>
+</html>
